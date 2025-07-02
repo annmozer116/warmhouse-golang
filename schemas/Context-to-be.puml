@@ -14,30 +14,23 @@ Person(admin, "Администратор", "Администратор экос
 
 Enterprise_Boundary(c0, "Система управления умным домом") {
     Boundary(smart_home_manage_b, $type="Домен", "Домен управления умным домом") {
-        System(smart_home_manage, "Сервис управления устройствами")
+        System(smart_home_manage, "Система управления устройствами")
         Boundary(sensors_manage_b, $type="поддомен", "Поддомен управления устройствами"){
-            System(location_c, "Контекст управления локациями")
             System(sensors_manage_с, "Контекст управление устройствами")
-            System(sensors_command_с, "Контекст отправка команд на устройство")
         }
-        Boundary(sensors_monitoring_b, $type="поддомен", "Поддомен мониторинг устройств"){
+        Boundary(sensors_monitoring_b, $type="поддомен", "Поддомен взаимодействие с устройствами"){
             System(sensors_monitoring_c, "Контекст получение и обработка телеметрии с устройств")
+            System(sensors_command_с, "Контекст отправка команд на устройство")
         }
     }
     System_Boundary(scenario_b, "Домен автоматизации сценариев") {
-        System(scenario, "Сервис автоматизации сценариев")
         Boundary(scenario_manage_b, $type="поддомен", "Поддомен управление сценариями"){
-            System(scenario_manage_c, "Контекст управление сценариями умного дома")
-            System(scenario_publish_с, "Контекст публикация сценария умного дома")
-        }
-        Boundary(scenario_acting_b, $type="поддомен", "Поддомен исполнение сценариев"){
-            System(scenario_event_monitoring_c, "Контекст отслеживание событий")
-            System(scenario_command_c, "Контекст отправка команд из сценария на устройства")
+            System(scenario_manage_c, "Контекст создание и управление сценариями умного дома")
+            System(scenario_event_monitoring_c, "Контекст отслеживание событий и отправка команд на устройства")
         }
     }
 
     System_Boundary(system_manage_b, "Домен управления экосистемой") {
-        System(system_manage, "Сервис управления экосистемой")
         Boundary(partners_manage_b, $type="поддомен", "Поддомен управление парнерами"){
             System(partners_manage_c, "Контекст управление доступными устройствами партнеров и командами ")
         }
@@ -51,31 +44,31 @@ Enterprise_Boundary(c0, "Система управления умным домо
 
 Rel(user,smart_home_manage, "Управляет устройствами")
 Rel(user, user_manage_c, "Авторизуется и регистрируется")
-Rel(smart_home_manage, location_c, " Получает список локаций via")
-Rel(sensors_manage_с, location_c, " Получает список локаций,регистрирует локацию via ???")
-Rel(smart_home_manage, sensors_manage_с, " Управляет, регистрирует устройства via")
-Rel(smart_home_manage, sensors_command_с, " Отправляет команды на устройства via")
-Rel(sensors_command_с, sensor, " Получает телеметрию")
 
-Rel(user,scenario, "Управляет сценариями")
-Rel(scenario, scenario_manage_b, "Управляет сценариями")
-Rel(scenario_manage_b, scenario_command_c, "Публикует сценарий via")
+Rel(smart_home_manage, sensors_manage_с, " Получает, регистрирует устройства via")
+Rel(smart_home_manage, sensors_monitoring_c, "Получает телеметрию via")
+Rel(smart_home_manage, sensors_command_с, "Отправляет команды на устройства via")
 
+Rel(sensors_manage_с, partners_manage_c, " Получает доступные устройства via")
+Rel(sensors_manage_с, sensors_monitoring_c, "Сообщает о новых устройствах")
 
-' Rel_Neighbor(customer, banking_system, "Uses")
-' Rel_R(customer, atm, "Withdraws cash using")
-' Rel_Back(customer, mail_system, "Sends e-mails to")
+Rel(sensors_monitoring_c, sensor, "Получает телеметрию")
+' Rel(sensors_monitoring_c, scenario_event_monitoring_c, "Передает телеметрию для сценариев")
 
-' Rel_R(customer, customer_service, "Asks questions to", "Telephone")
+Rel(sensors_command_с, sensor, "Отправляет команды")
+Rel(sensors_command_с, partners_manage_c, "Проверяет доступные команды")
 
-' Rel_D(banking_system, mail_system, "Sends e-mail using")
-' Rel_R(atm, mainframe, "Uses")
-' Rel_R(banking_system, mainframe, "Uses")
-' Rel_D(customer_service, mainframe, "Uses")
-' Rel_U(back_office, mainframe, "Uses")
+Rel(user,scenario_manage_c, "Управляет сценариями")
+' систем управления сценариями получает статус исполнения сценариев
 
-' Lay_D(atm, banking_system)
+Rel(scenario_manage_c,scenario_event_monitoring_c, "Сообщает об изменении сценария")
 
-' Lay_D(atm, customer)
-' Lay_U(mail_system, customer)
+Rel(scenario_event_monitoring_c, sensors_monitoring_c, "Получает телеметрию для сценариев")
+' или напрямую с датчика? 
+Rel(scenario_event_monitoring_c, sensors_command_с, "Отправляет команды")
+Rel(scenario_event_monitoring_c, scenario_manage_c, "Сообщает о статусе исполнения сценария")
+
+Rel(admin, partners_manage_c, "Управляет доступными устройствами,партнерами, командами")
+Rel(admin, user_manage_c, "Управляет доступом клиентов")
+Rel(user, user_manage_c, "Регистрируется, получает доступы")
 @enduml

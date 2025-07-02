@@ -1,8 +1,6 @@
 # Build stage
 FROM golang:1.23.2-alpine AS builder
 
-
-
 # Set working directory
 WORKDIR /app
 
@@ -29,10 +27,6 @@ WORKDIR /app
 
 # Copy the binary from the builder stage
 COPY --from=builder /app/temperature-api .
-
-# Expose the port the app runs on
-ENV PORT=8081
-EXPOSE $PORT
 
 # Command to run the application
 CMD ["./temperature-api"]

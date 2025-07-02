@@ -1,0 +1,81 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+' uncomment the following line and comment the first to use locally
+' !include C4_Context.puml
+
+LAYOUT_TOP_DOWN()
+' LAYOUT_AS_SKETCH()
+LAYOUT_WITH_LEGEND()
+
+title System Landscape diagram for Warm House TO-BE
+
+Person(user, "Клиент", "Клиент экосистемы умного дома")
+Person(admin, "Администратор", "Администратор экосистемы")
+
+Enterprise_Boundary(c0, "Система управления умным домом") {
+    Boundary(smart_home_manage_b, $type="Домен", "Домен управления умным домом") {
+        System(smart_home_manage, "Сервис управления устройствами")
+        Boundary(sensors_manage_b, $type="поддомен", "Поддомен управления устройствами"){
+            System(location_c, "Контекст управления локациями")
+            System(sensors_manage_с, "Контекст управление устройствами")
+            System(sensors_command_с, "Контекст отправка команд на устройство")
+        }
+        Boundary(sensors_monitoring_b, $type="поддомен", "Поддомен мониторинг устройств"){
+            System(sensors_monitoring_c, "Контекст получение и обработка телеметрии с устройств")
+        }
+    }
+    System_Boundary(scenario_b, "Домен автоматизации сценариев") {
+        System(scenario, "Сервис автоматизации сценариев")
+        Boundary(scenario_manage_b, $type="поддомен", "Поддомен управление сценариями"){
+            System(scenario_manage_c, "Контекст управление сценариями умного дома")
+            System(scenario_publish_с, "Контекст публикация сценария умного дома")
+        }
+        Boundary(scenario_acting_b, $type="поддомен", "Поддомен исполнение сценариев"){
+            System(scenario_event_monitoring_c, "Контекст отслеживание событий")
+            System(scenario_command_c, "Контекст отправка команд из сценария на устройства")
+        }
+    }
+
+    System_Boundary(system_manage_b, "Домен управления экосистемой") {
+        System(system_manage, "Сервис управления экосистемой")
+        Boundary(partners_manage_b, $type="поддомен", "Поддомен управление парнерами"){
+            System(partners_manage_c, "Контекст управление доступными устройствами партнеров и командами ")
+        }
+        Boundary(user_manage_b, $type="поддомен","Поддомен управление пользователями"){
+            System(user_manage_c, "Контекст авторизация пользователя")
+        }
+
+    }
+    System_Ext(sensor, "Умные устройства")
+}
+
+Rel(user,smart_home_manage, "Управляет устройствами")
+Rel(user, user_manage_c, "Авторизуется и регистрируется")
+Rel(smart_home_manage, location_c, " Получает список локаций via")
+Rel(sensors_manage_с, location_c, " Получает список локаций,регистрирует локацию via ???")
+Rel(smart_home_manage, sensors_manage_с, " Управляет, регистрирует устройства via")
+Rel(smart_home_manage, sensors_command_с, " Отправляет команды на устройства via")
+Rel(sensors_command_с, sensor, " Получает телеметрию")
+
+Rel(user,scenario, "Управляет сценариями")
+Rel(scenario, scenario_manage_b, "Управляет сценариями")
+Rel(scenario_manage_b, scenario_command_c, "Публикует сценарий via")
+
+
+' Rel_Neighbor(customer, banking_system, "Uses")
+' Rel_R(customer, atm, "Withdraws cash using")
+' Rel_Back(customer, mail_system, "Sends e-mails to")
+
+' Rel_R(customer, customer_service, "Asks questions to", "Telephone")
+
+' Rel_D(banking_system, mail_system, "Sends e-mail using")
+' Rel_R(atm, mainframe, "Uses")
+' Rel_R(banking_system, mainframe, "Uses")
+' Rel_D(customer_service, mainframe, "Uses")
+' Rel_U(back_office, mainframe, "Uses")
+
+' Lay_D(atm, banking_system)
+
+' Lay_D(atm, customer)
+' Lay_U(mail_system, customer)
+@enduml

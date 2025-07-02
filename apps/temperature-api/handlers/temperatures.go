@@ -1,8 +1,9 @@
 package handlers
 
 import (
-	"log"
+	"math/rand/v2"
 	"net/http"
+	"temperature-api/utils"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -35,16 +36,24 @@ func (h *TemperatureHandler) RegisterRoutes(router *gin.RouterGroup) {
 }
 
 func (h *TemperatureHandler) GetTemperatureByLocation(c *gin.Context) {
-	location := c.Param("location")
-	sensorID := c.Param("sensorID")
+	location := c.Query("location")
 
 	var tempRes TemperatureResponse
-	log.Printf("Location is %s", location)
-	log.Printf("sensorID is %s", sensorID)
+
+	tempRes.SensorID = utils.GenerateSensorID(location)
+	tempRes.Location = location
+	tempRes.Timestamp = time.Now()
+	tempRes.Value = randomTemperature()
 
 	c.JSON(http.StatusOK, tempRes)
 }
 
 func (h *TemperatureHandler) GetTemperatureBySensorID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "GetTemperatureBySensorID"})
+}
+
+func randomTemperature() float64 {
+	min := 17
+	max := 35
+	return float64(rand.IntN(max-min) + min)
 }

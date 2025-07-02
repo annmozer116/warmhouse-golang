@@ -56,14 +56,14 @@ func main() {
 	}
 
 	log.Println("Server exited properly")
-
 }
 
 // getEnv gets an environment variable or returns a default value
 func getEnv(key, defaultValue string) string {
 	value := os.Getenv(key)
+	log.Printf("port value is %s", value)
 	if value == "" {
 		return defaultValue
 	}
-	return value
+	return ":" + value
 }

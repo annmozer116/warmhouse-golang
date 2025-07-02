@@ -57,6 +57,8 @@ func (h *TemperatureHandler) GetTemperatureBySensorID(c *gin.Context) {
 	tempRes.Location = utils.GenerateLocation(sensorID)
 	tempRes.Timestamp = time.Now()
 	tempRes.Value = randomTemperature()
+	tempRes.SensorType = "temperature"
+	tempRes.Unit = "°C"
 
 	c.JSON(http.StatusOK, tempRes)
 }

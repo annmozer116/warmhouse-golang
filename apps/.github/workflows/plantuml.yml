@@ -27,16 +27,16 @@ jobs:
 
       - name: Generate Diagrams
         run: |
-          plantuml diagrams/context/*.puml
-          plantuml diagrams/container/*.puml
-          plantuml diagrams/component/*.puml
-          plantuml diagrams/code/*.puml
+          plantuml schemas/context/*.puml
+          plantuml schemas/container/*.puml
+          plantuml schemas/component/*.puml
+          plantuml schemas/code/*.puml
 
       - name: Commit Diagrams
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add diagrams/**/*.png
+          git add schemas/**/*.png
           git commit -m "Automated diagram generation"
           git push origin main
         if: success()

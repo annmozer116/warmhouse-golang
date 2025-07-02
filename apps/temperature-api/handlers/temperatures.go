@@ -31,7 +31,7 @@ func (h *TemperatureHandler) RegisterRoutes(router *gin.RouterGroup) {
 	temperature := router.Group("/temperature")
 	{
 		temperature.GET("", h.GetTemperatureByLocation)
-		temperature.GET("/:sensorID", h.GetTemperatureByLocation)
+		temperature.GET("/:sensorID", h.GetTemperatureBySensorID)
 	}
 }
 
@@ -49,7 +49,16 @@ func (h *TemperatureHandler) GetTemperatureByLocation(c *gin.Context) {
 }
 
 func (h *TemperatureHandler) GetTemperatureBySensorID(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "GetTemperatureBySensorID"})
+	sensorID := c.Param("sensorID")
+
+	var tempRes TemperatureResponse
+
+	tempRes.SensorID = sensorID
+	tempRes.Location = utils.GenerateLocation(sensorID)
+	tempRes.Timestamp = time.Now()
+	tempRes.Value = randomTemperature()
+
+	c.JSON(http.StatusOK, tempRes)
 }
 
 func randomTemperature() float64 {

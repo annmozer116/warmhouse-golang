@@ -40,6 +40,13 @@ jobs:
           # Используем `if-no-files-found: error` или `warn` - но в нашем случае файлы есть
           if-no-files-found: warn
 
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./schemas
+          destination_dir: diagrams
+
       # - name: Commit Diagrams
       #   run: |
       #     git config --local user.email "github-actions[bot]@users.noreply.github.com"

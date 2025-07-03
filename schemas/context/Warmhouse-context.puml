@@ -1,6 +1,5 @@
-@startuml Warmhousesystem
+@startuml Warmhouse-context
 title Warm house system Context Diagram
-
 
 !includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
 

@@ -30,17 +30,25 @@ jobs:
 
       - name: Generate Diagrams
         run: |
-          find schemas/context -name "*.puml" -not -path "./.git/*" -exec java -jar plantuml.jar -tpng {} \;
+          find schemas -name "*.puml" -not -path "./.git/*" -exec java -jar plantuml.jar -tpng {} \;
 
-      - name: Commit Diagrams
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add schemas/**/*.png
-          git diff --quiet && git diff --staged --quiet || git commit -m "Automated diagram generation"
-          git push
-          # git commit -m "Automated diagram generation"
-          # git push origin warmhouse
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: success()
+      - name: Upload diagrams as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagrams
+          path: schemas/**/*.png
+          # Используем `if-no-files-found: error` или `warn` - но в нашем случае файлы есть
+          if-no-files-found: warn
+
+      # - name: Commit Diagrams
+      #   run: |
+      #     git config --local user.email "github-actions[bot]@users.noreply.github.com"
+      #     git config --local user.name "github-actions[bot]"
+      #     git add schemas/**/*.png
+      #     git diff --quiet && git diff --staged --quiet || git commit -m "Automated diagram generation"
+      #     git push
+      #     # git commit -m "Automated diagram generation"
+      #     # git push origin warmhouse
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   if: success()

@@ -7,7 +7,7 @@ LAYOUT_TOP_DOWN()
 ' LAYOUT_AS_SKETCH()
 LAYOUT_WITH_LEGEND()
 
-title System Landscape diagram for Warm House TO-BE
+title Smarthome-Context-Map TO-BE
 
 Person(user, "Клиент", "Клиент экосистемы умного дома")
 Person(admin, "Администратор", "Администратор экосистемы")

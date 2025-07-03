@@ -9,6 +9,8 @@ jobs:
   generate-diagrams:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'Automated diagram generation')"
+    permissions:
+      contents: write # Даем разрешение на запись в репозиторий
 
     steps:
       - name: Checkout repository
@@ -19,6 +21,9 @@ jobs:
         with:
           java-version: "11"
           distribution: "temurin"
+
+      - name: Install Graphviz
+        run: sudo apt-get install -y graphviz
 
       - name: Download PlantUML
         run: wget -O plantuml.jar https://github.com/plantuml/plantuml/releases/download/v1.2024.4/plantuml-1.2024.4.jar
@@ -36,4 +41,6 @@ jobs:
           git push
           # git commit -m "Automated diagram generation"
           # git push origin warmhouse
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: success()

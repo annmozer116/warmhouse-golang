@@ -1,0 +1,52 @@
+@startuml Smarthome-component-sensors-manage
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+' uncomment the following line and comment the first to use locally
+' !include C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+
+title Component diagram for sensors-manage-service container
+
+Container(admin_web_app, "Web Application", "ReactJS", "Сайт для администрирования экосистемы")
+Container(mobile_app, "Mobile App", "C#, Xamarin", "Приложение для управления умным домом для клиента")
+
+Container(partner_service, "Partner service", "Golang", "Сервис управления доступными устройствами партнеров и их командами")
+ContainerDb(sensors_manage_service_db, "Sensors-manage-db", "Postgresql", "Зарегистрированные устройства, привязка к локации, каталог локаций")
+ContainerDb(telemetry_cache, "Telemetry cache", "Redis", "Телеметрия")
+ContainerDb(telemetry_history, "Telemetry history", "S3", "Телеметрия (теплые данные)")
+
+ContainerQueue(smarthome_mq, "Message Queue", "kafka")
+
+Container_Boundary(sensors_manage_service, "Sensors manage service") {
+    Component(auth_check, "Auth check","Component", "Проверяет доступ по токену")
+    Component(sensors_controller, "Sensors management controller", "MVC Rest Controller", "API для взаимодействия с устройствами")
+
+    Component(sensors_service, "Sensors component", "Компонент", "Компонент управления устройствами")
+    Component(location_service, "Location component", "Компонент", "Компонент управления локациями")
+    Component(telemetry_service, "Telemetry component", "Компонент", "Компонент получения телеметрии")
+    Component(command_service, "Command component", "Компонент", "Компонент отправки команд на устройство")
+    Component(partner_component, "Partner component", "Компонент", "Компонент валидации устройств и команд")
+
+}
+Rel(mobile_app, sensors_controller, "Use", "WebSockets, HTTPS")
+Rel(admin_web_app, sensors_controller, "Use", "HTTPS")
+
+
+Rel(sensors_controller, sensors_service, "use")
+Rel(sensors_controller, location_service, "use")
+Rel(sensors_controller, telemetry_service, "use")
+Rel(sensors_controller, command_service, "use")
+Rel(sensors_controller, auth_check, "use")
+Rel(sensors_controller, partner_component, "use")
+
+Rel(partner_component, partner_service, "use", "JSON/HTTPS")
+
+Rel(sensors_service, sensors_manage_service_db, "read, write to", "JDBC")
+Rel(sensors_service, telemetry_cache, "write to", "TCP")
+
+Rel(location_service, sensors_manage_service_db, "read, write to", "JDBC")
+Rel(telemetry_service, telemetry_cache, "reads from", "TCP")
+Rel(telemetry_service, telemetry_history, "reads from", "JSON/HTTPS")
+Rel(command_service, smarthome_mq, "sends commands", "JSON/TCP")
+
+@enduml

@@ -1,0 +1,29 @@
+@startuml Smarthome-component-partner
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+' uncomment the following line and comment the first to use locally
+' !include C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+
+title Component diagram for partner-service container
+
+Container(admin_web_app, "Web Application", "ReactJS", "Сайт для администрирования экосистемы")
+ContainerDb(partner_service_db, "Partner-db", "Postgresql", "Каталог доступных устройств и их команд")
+Container(sensors_manage_service, "Sensors manage service", "Golang", "Сервис позволяет зарегистрировать устройство, локацию, получить список устройств и их состояние")
+
+Container_Boundary(partner_service, "Partner service container") {
+    Component(auth_check, "Auth check","Component", "Проверяет доступ по токену")
+    Component(sensors_catalog_controller, "Sensors catalog controller", "MVC Rest Controller", "API для управления каталогом устройств и их команд, партнеров")
+
+    Component(sensors_catalog_service, "Sensors catalog component", "Component", "Компонент для управления каталогом")
+}
+Rel(admin_web_app, sensors_catalog_controller, "Use", "JSON/HTTPS")
+Rel(sensors_manage_service, sensors_catalog_controller, "Use", "JSON/HTTPS")
+
+Rel_L(sensors_catalog_controller, auth_check, "use")
+Rel_R(sensors_catalog_controller, sensors_catalog_service, "use")
+
+Rel(sensors_catalog_service, partner_service_db, "read, write", "JDBC")
+
+@enduml

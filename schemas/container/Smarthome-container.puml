@@ -25,7 +25,7 @@ System_Boundary(c1, "Система управления умным домом")
     Container(sensors_manage_service, "Sensors manage service", "Golang", "Сервис позволяет зарегистрировать устройство, локацию, получить список устройств и их состояние")
     ContainerDb(sensors_manage_service_db, "Sensors-manage-db", "Postgresql", "Зарегистрированные устройства, привязка к локации, каталог локаций")
 
-    Container(sensors_service, "Sensors gateway", "Golang", "Сервис взаимодействия с устройствами (отправка команд и сбор телеметрии)")
+    Container(sensors_gw_service, "Sensors gateway", "Golang", "Сервис взаимодействия с устройствами (отправка команд и сбор телеметрии)")
     ContainerDb(telemetry_cache, "Telemetry cache", "Redis", "Телеметрия")
     ContainerDb(telemetry_history, "Telemetry history", "S3", "Телеметрия (теплые данные)")
 
@@ -42,31 +42,33 @@ System_Ext(sensor, "Умные устройства")
 Rel(user, mobile_app, "uses", "HTTPS")
 Rel(admin, admin_web_app, "uses", "HTTPS")
 
-Rel_Neighbor(mobile_app,user_service, "authorize by", "HTTPS")
-Rel_Neighbor(admin_web_app,user_service, "use, authorize by", "HTTPS")
+Rel_R(mobile_app,user_service, "authorize by", "HTTPS")
+Rel(admin_web_app,user_service, "use, authorize by", "HTTPS")
 Rel(admin_web_app,sensors_manage_service, "uses", "HTTPS")
-Rel(user_service,user_service_db, "read, write data", "sync, JDBC")
+Rel_Neighbor(user_service,user_service_db, "read, write data", "sync, JDBC")
 
 Rel(admin_web_app, partner_service, "uses", "HTTPS")
 Rel(partner_service, partner_service_db, "Read, write data", "sync, JDBC")
 
 Rel(mobile_app, sensors_manage_service, "uses", "WebSockets")
-Rel(sensors_manage_service, sensors_manage_service_db, "read, write data", "sync, JDBC")
+Rel_Neighbor(sensors_manage_service, sensors_manage_service_db, "read, write data", "sync, JDBC")
 
 Rel(sensors_manage_service, smarthome_mq, "sends command", "TCP")
-Rel_U(sensors_service, smarthome_mq, "reads command, write telemetry", "TCP")
+Rel_U(sensors_gw_service, smarthome_mq, "reads command, write telemetry", "TCP")
 
 Rel(sensors_manage_service, partner_service, "check device", "HTTPS")
 Rel(sensors_manage_service, telemetry_cache, "read telemetry, write devices", "TCP")
 Rel(sensors_manage_service, telemetry_history, "read telemetry if cache empty", "HTTPS")
 
-Rel(sensors_service, sensor, "sends command", "HTTPS/other internet protocols")
-Rel_U(sensors_service, telemetry_cache, "write telemetry, read devices", "TCP")
-Rel_U(sensors_service, telemetry_history, "write", "HTTPS")
+Rel(sensors_gw_service, sensor, "sends command", "HTTPS/other internet protocols")
+Rel_U(sensors_gw_service, telemetry_cache, "write telemetry, read devices", "TCP")
+Rel_Neighbor(sensors_gw_service, telemetry_history, "write", "HTTPS")
 
 Rel(mobile_app, scenario_service, "uses", "HTTPS")
-Rel(scenario_service, scenario_service_db, "read, write data", "JDBC")
+Rel_L(scenario_service, scenario_service_db, "read, write data", "JDBC")
 Rel(scenario_service, smarthome_mq, "reads telemetry, sends command", "TCP")
+Rel(scenario_service, telemetry_cache, "reads sensor status", "TCP")
+
 
 
 ' System_Ext(email_system, "E-Mail System", "The internal Microsoft Exchange system")

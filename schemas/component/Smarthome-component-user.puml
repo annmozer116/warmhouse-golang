@@ -1,0 +1,40 @@
+@startuml Smarthome-component-user
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+' uncomment the following line and comment the first to use locally
+' !include C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+
+title Component diagram for user-service container
+
+Container(admin_web_app, "Web Application", "ReactJS", "Сайт для администрирования экосистемы")
+Container(mobile_app, "Mobile App", "C#, Xamarin", "Приложение для управления умным домом для клиента")
+ContainerDb(user_service_db, "User-db", "Postgresql", "Пользователи, роли, пермишены, сессии")
+
+Container_Boundary(user_service, "User service container") {
+    Component(auth_controller, "Authorization controller", "MVC Rest Controller", "API для авторизации")
+    Component(user_controller, "User controller", "MVC Rest Controller", "API для управления пользователями")
+    
+    Component(auth_check, "Auth check","Component", "Проверяет доступ по токену")
+
+    Component(auth_component, "Auth component", "Component", "Компонент работы с авторизацией, регистрацией, выдачей токена")
+    Component(user_manage_service, "User component", "Component", "Компонент для управления пользователями")
+
+}
+Rel(mobile_app, auth_controller, "Use", "JSON/HTTPS")
+Rel(admin_web_app, auth_controller, "Use", "JSON/HTTPS")
+Rel(admin_web_app, user_controller, "Use", "JSON/HTTPS")
+
+Rel_L(auth_controller, auth_check, "use")
+Rel_R(user_controller, auth_check, "use")
+
+Rel(auth_controller, user_manage_service, "use")
+Rel(auth_controller, auth_component, "use")
+
+Rel(user_controller, user_manage_service, "use")
+
+Rel(user_manage_service, user_service_db, "read, write", "JDBC")
+Rel(auth_component, user_service_db, "read, write", "JDBC")
+
+@enduml

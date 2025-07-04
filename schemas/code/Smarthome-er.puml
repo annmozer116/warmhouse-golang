@@ -1,4 +1,4 @@
-@startuml
+@startuml Smarthome-ER
 entity User {
     id
     name

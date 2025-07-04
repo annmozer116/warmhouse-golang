@@ -1,0 +1,41 @@
+
+
+@startuml Smarthome-component-device-gateway
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+' uncomment the following line and comment the first to use locally
+' !include C4_Component.puml
+LAYOUT_WITH_LEGEND()
+LAYOUT_TOP_DOWN()
+
+title Component diagram for device-gateway container
+
+ContainerDb(telemetry_cache, "Telemetry cache", "Redis", "Телеметрия")
+ContainerDb(telemetry_history, "Telemetry history", "S3", "Телеметрия (теплые данные)")
+
+System_Ext(device, "Умные устройства")
+
+ContainerQueue(smarthome_mq, "Message Queue", "kafka")
+
+Container_Boundary(device_gw_service, "device gateway container") {
+    Component(device_gw,"Device gateway", "Component", "Компонент внешних соединений с устройствами")
+    Component(device_service,"Device service", "Service", "Сервис проверки устройств")
+    Component(telemetry_service,"Telemetry component", "Component", "Компонент обработки телеметрии")
+    Component(command_service,"Command component", "Component", "Компонент обработки команд")
+}
+Rel_U(command_service, smarthome_mq, "read, write", "JSON Binary/TCP")
+
+Rel_U(telemetry_service, smarthome_mq, "write", "JSON Binary/TCP")
+Rel(telemetry_service, telemetry_cache, "write", "TCP?")
+Rel(telemetry_service, telemetry_history, "write", "HTTPS")
+
+Rel_Neighbor(command_service, device_service, "use")
+Rel_Neighbor(telemetry_service, device_service, "use")
+Rel_U(device_service, telemetry_cache, "read", "TCP")
+
+Rel(command_service, device_gw, "publish task")
+Rel_U(device_gw, telemetry_service, "publish data")
+
+Rel_U(device, device_gw, "use", "JSON Binary/HTTPS, other internet protocols")
+Rel_D(device_gw, device, "use", "JSON Binary/HTTPS, other internet protocols")
+
+@enduml

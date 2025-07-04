@@ -1,24 +1,24 @@
 
 
-@startuml Smarthome-component-sensors-gateway
+@startuml Smarthome-component-device-gateway
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
 ' uncomment the following line and comment the first to use locally
 ' !include C4_Component.puml
 LAYOUT_WITH_LEGEND()
 LAYOUT_TOP_DOWN()
 
-title Component diagram for sensors-gateway container
+title Component diagram for device-gateway container
 
 ContainerDb(telemetry_cache, "Telemetry cache", "Redis", "Телеметрия")
 ContainerDb(telemetry_history, "Telemetry history", "S3", "Телеметрия (теплые данные)")
 
-System_Ext(sensor, "Умные устройства")
+System_Ext(device, "Умные устройства")
 
 ContainerQueue(smarthome_mq, "Message Queue", "kafka")
 
-Container_Boundary(sensors_gw_service, "Sensors gateway container") {
-    Component(sensors_gw,"Sensors gateway", "Component", "Компонент внешних соединений с устройствами")
-    Component(sensors_service,"Sensors service", "Service", "Сервис проверки устройств")
+Container_Boundary(device_gw_service, "device gateway container") {
+    Component(device_gw,"device gateway", "Component", "Компонент внешних соединений с устройствами")
+    Component(device_service,"Device component", "Service", "Сервис проверки устройств")
     Component(telemetry_service,"Telemetry component", "Component", "Компонент обработки телеметрии")
     Component(command_service,"Command component", "Component", "Компонент обработки команд")
 }
@@ -28,14 +28,16 @@ Rel_U(telemetry_service, smarthome_mq, "write", "JSON Binary/TCP")
 Rel(telemetry_service, telemetry_cache, "write", "TCP?")
 Rel(telemetry_service, telemetry_history, "write", "HTTPS")
 
-Rel_Neighbor(command_service, sensors_service, "use")
-Rel_Neighbor(telemetry_service, sensors_service, "use")
-Rel_U(sensors_service, telemetry_cache, "read", "TCP")
+Rel_Neighbor(command_service, device_service, "use")
+Rel_Neighbor(telemetry_service, device_service, "use")
+Rel_U(device_service, telemetry_cache, "read, write", "TCP")
 
-Rel(command_service, sensors_gw, "publish task")
-Rel_U(sensors_gw, telemetry_service, "publish data")
+Rel(command_service, device_gw, "publish task")
+Rel_U(device_gw, telemetry_service, "publish data")
 
-Rel_U(sensor, sensors_gw, "use", "JSON Binary/HTTPS, other internet protocols")
-Rel_D(sensors_gw, sensor, "use", "JSON Binary/HTTPS, other internet protocols")
+Rel_U(device, device_gw, "use", "JSON Binary/HTTPS, other internet protocols")
+Rel_D(device_gw, device, "use", "JSON Binary/HTTPS, other internet protocols")
+
+Rel(device_service, smarthome_mq, "read device update", "JSON Binary/TCP")
 
 @enduml

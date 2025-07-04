@@ -1,0 +1,32 @@
+@startuml Smarthome-component-scenario
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+' uncomment the following line and comment the first to use locally
+' !include C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+
+title Component diagram for scenario-service container
+
+Container(mobile_app, "Mobile App", "C#, Xamarin", "Приложение для управления умным домом для клиента")
+ContainerQueue(smarthome_mq, "Message Queue", "kafka")
+ContainerDb(scenario_service_db, "Scenario db", "Object-oriented-db", "Сценарии")
+
+Container_Boundary(scenario_service, "Scenarion service container") {
+    Component(auth_check, "Auth check","Component", "Проверяет доступ по токену")
+    Component(scenario_controller, "Scenario management controller", "MVC Rest Controller", "API для взаимодействия со сецнариями")
+
+    Component(scenario_manage_service, "Scenario component", "Компонент", "Компонент управления сценариями")
+    Component(scenario_engine, "Scenario engine component", "Компонент", "Компонент автоматизации сценариев")
+
+}
+Rel(mobile_app, scenario_controller, "Use", "JSON/HTTPS")
+
+Rel(scenario_controller, scenario_manage_service, "use")
+Rel(scenario_controller, auth_check, "use")
+
+Rel(scenario_manage_service, scenario_service_db, "read, write to", "JDBC")
+
+Rel(scenario_engine, scenario_service_db, "read, write to", "JDBC")
+Rel_U(scenario_engine, smarthome_mq, "read telemetry, write commands", "JSON Binary/TCP")
+
+@enduml

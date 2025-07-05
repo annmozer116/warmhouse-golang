@@ -272,6 +272,42 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /devices/{device_id}/command:
+    post:
+      summary: Команда на устройство
+      security:
+        - TestUserId: []
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                command:
+                  type: string
+                  enum: [on, off, open, close, change_value]
+                  example: "change_value"
+                value:
+                  type: number
+                  example: 25.5
+      responses:
+        "201":
+          description: Команда отправлена
+        "404":
+          description: Устройство не найдено
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /devices/{device_id}/telemetry:
     get:
       summary: Получить последние показатели телеметрии
@@ -316,3 +352,4 @@ paths:
 
 security:
   - BearerAuth: []
+  - TestUserId: []

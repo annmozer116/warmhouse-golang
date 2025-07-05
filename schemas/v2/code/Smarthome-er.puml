@@ -48,7 +48,7 @@ entity Partner {
 entity House {
     PK id
     name
-    region
+    geolocation
     FK owner_id (User)
 }
 

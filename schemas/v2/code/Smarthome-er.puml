@@ -1,66 +1,116 @@
 @startuml Smarthome-ER
 entity User {
-    id
+    PK id
     name
     email
     is_blocked
 }
 
 entity Device {
-    id
+    PK id
     name
     status
     serial_number
+    FK device_model_id (Device_Model)
+    FK location_id (Location)
+    FK owner_id (User)
 }
 
-enum Device_Classification_Enum {
-    code
-    name
+entity Command {
+    PK id
+    command
+    FK device_id (Device)
+    JSON params
+    status
+    created_at
+    FK created_by_user_id (User), nullable
+    FK created_by_scenario_id (Scenario), nullable
 }
 
-entity Device_Type {
-    id
+entity Device_Model {
+    PK id
     name
-    unit
     is_supported
+    FK partner_id (Partner)
+    classification_code
+
     +JSON connection_data
     +JSON avalable_commands 
 }
 
 entity Partner {
-    id
+    PK id
     name
     inn
 }
 
 
 entity House {
-    id
+    PK id
     name
+    region
+    FK owner_id (User)
 }
 
 entity Location {
-    id
+    PK id
     name
+    FK house_id (House)
 }
 
 entity Telemetry {
-    date
+    PK id
+    created_at
     value
     unit
+    metric_type
+    FK device_id (Device)
 }
 
 entity Scenario {
-    scenario_data
+    PK id
+    FK owner_id (User)
 }
+
+entity Scenario_Step {
+    FK id
+    PK scenario_id (Scenario)
+    JSON condition (some triggers)
+    JSON action (some actions)
+    status
+}
+
+entity Trigger {
+    FK id
+    FK device_id (Device), nullable
+    metric_type
+    condition
+    FK Scenario_step_id (Scenario_Step)
+    status (found, resolved)
+}
+
+entity Action {
+    PK id
+    FK device_id (Device), nullable
+    command
+    FK Scenario_step_id (Scenario_Step)
+    status
+}
+
+Scenario "1" -- "1..*" Scenario_Step: has
+Scenario_Step "1" -- "1..*" Trigger: has
+Scenario_Step "1" -- "1..*" Action: has
+Trigger "0..*" -- "0 or 1" Device: belongs
+Action "0..*" -- "0 or 1" Device: belongs
 
 User "1" -- "0..*" House: has
 House "1" -- "1..*" Location: includes
 Location "1" -- "0..*" Device: includes
 Device "1" -- "0..*" Telemetry: has
-Device "0..*" -- "1" Device_Type: has
-Scenario "1..*" -- "1..*" Device: includes
-Device_Type "0..*" -- "1" Partner: developed by
-Device_Type "0..*" -- "1" Device_Classification_Enum: classified as
+Device "0..*" -- "1" Device_Model: is
+Device_Model "0..*" -- "1" Partner: developed by
+
+Command "0..*" -- "0 or 1" User: created by
+Command "0..*" -- "0 or 1" Scenario: created by
 
 @enduml

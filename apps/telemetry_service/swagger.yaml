@@ -1,0 +1,318 @@
+openapi: 3.0.0
+info:
+  title: Device-service
+  description: Сервис регистрации устройств, управления устройствами и работы с телеметрией
+  version: 1.0.0
+servers:
+  - url: https://localhost:8082
+    description: Local API
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    TestUserId:
+      type: apiKey
+      in: header
+      description: Only userId is for testing, JWT to be done
+      name: X-user-id
+  schemas:
+    Device:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: d3b8b8a0-5b9a-4e8f-8c0d-7b6f2d2b8d8c
+        name:
+          type: string
+          example: "Лампочка в люстре"
+        classification_type:
+          type: string
+          enum: [lighting, thermostat, videocam, smoke_detector]
+          example: thermostat
+        location_id:
+          type: string
+          format: uuid
+          example: f8a7b3d4-1a9c-4e2f-b2d8-7c6f5e3a9d1b
+        status:
+          type: string
+          enum: [active, inactive, connecting]
+          example: active
+        serial_number:
+          type: string
+          example: 5ASKY7-57FGT
+
+    Location:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: f8a7b3d4-1a9c-4e2f-b2d8-7c6f5e3a9d1b
+        name:
+          type: string
+          example: "Кухня"
+        house_id:
+          type: string
+          format: uuid
+          example: g8a8b3d4-1b9c-4e2f-b2d8-7c6f5e3a9d1b
+
+    House:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: f8a7b3d4-1a9c-4e2f-b2d8-7c6f5e3a9d1b
+        name:
+          type: string
+          example: "Дача"
+    Telemetry:
+      type: object
+      properties:
+        value:
+          type: number
+          format: float
+          example: 23.4
+        status:
+          type: string
+          enum: [on, off]
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-05-15T12:30:45Z"
+
+    ShortDeviceWithTelemetry:
+      allOf:
+        - $ref: "#/components/schemas/Device"
+        - type: object
+          properties:
+            last_telemetry:
+              $ref: "#/components/schemas/Telemetry"
+
+    FullDeviceWithTelemetry:
+      allOf:
+        - $ref: "#/components/schemas/Device"
+        - type: object
+          properties:
+            house:
+              $ref: "#/components/schemas/House"
+            location:
+              $ref: "#/components/schemas/Location"
+            last_telemetry:
+              $ref: "#/components/schemas/Telemetry"
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Device not found"
+        code:
+          type: integer
+          example: 404
+
+paths:
+  /devices:
+    get:
+      summary: Список устройств пользователя с последней телеметрией
+      security:
+        - TestUserId: []
+      parameters:
+        - name: house_id
+          in: query
+          description: Фильтр по дому
+          schema:
+            type: string
+            format: uuid
+        - name: type
+          in: query
+          description: Фильтр по типу устройства
+          schema:
+            type: string
+            enum: [lighting, thermostat, videocam, smoke_detector]
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ShortDeviceWithTelemetry"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    post:
+      summary: Регистрация нового устройства
+      security:
+        - TestUserId: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                location_id:
+                  type: string
+                  format: uuid
+                model_id:
+                  type: string
+                  format: uuid
+                serial_number:
+                  type: string
+                  example: "4G6FK-67FRJ-6H"
+      responses:
+        "201":
+          description: Устройство создано
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Device"
+        "400":
+          description: Неверные параметры
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /devices/{device_id}:
+    get:
+      summary: Получить информацию об устройстве
+      security:
+        - TestUserId: []
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FullDeviceWithTelemetry"
+        "404":
+          description: Устройство не найдено
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    put:
+      summary: Обновить информацию об устройстве
+      security:
+        - TestUserId: []
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                location_id:
+                  type: string
+                  format: uuid
+                status:
+                  type: string
+                  enum: [active, inactive]
+      responses:
+        "200":
+          description: Устройство обновлено
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Device"
+        "403":
+          description: Нет прав на обновление
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    delete:
+      summary: Удалить устройство
+      security:
+        - TestUserId: []
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Устройство удалено
+        "404":
+          description: Устройство не найдено
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /devices/{device_id}/telemetry:
+    get:
+      summary: Получить последние показатели телеметрии
+      security:
+        - TestUserId: []
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          description: Количество записей (по умолчанию 10)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: since
+          in: query
+          description: Фильтр по времени (UTC)
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: Список показаний
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Telemetry"
+        "403":
+          description: Нет доступа к устройству
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+security:
+  - BearerAuth: []

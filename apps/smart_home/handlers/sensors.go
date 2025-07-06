@@ -148,7 +148,7 @@ func (h *SensorHandler) CreateSensor(c *gin.Context) {
 	log.Println(deviceResp)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"microservice error": err.Error()})
+		log.Printf("microservice error: %s", err.Error())
 		return
 	}
 

@@ -25,7 +25,7 @@ type DeviceAPIResponse struct {
 	Status        string    `json:"status"`
 	Serial_Number string    `json:"serial_number"`
 	LocationID    string    `json:"location_id"`
-	DeviceModelID string    `json:"model_id"`
+	DeviceModelID int       `json:"model_id"`
 	LastUpdated   time.Time `json:"last_updated"`
 	CreatedAt     time.Time `json:"created_at"`
 }

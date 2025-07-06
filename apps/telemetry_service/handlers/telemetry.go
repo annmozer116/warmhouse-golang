@@ -62,8 +62,11 @@ func (h *TelemetryHandler) GetTelemetryByDeviceID(c *gin.Context) {
 			limit = limit_i
 		}
 	}
-
-	deviceType := deviceTypes[rand.IntN(len(deviceTypes))]
+	device_type_param := c.Query("device_type")
+	deviceType, err := models.ConvertToDeviceType(device_type_param)
+	if err != nil {
+		deviceType = deviceTypes[rand.IntN(len(deviceTypes))]
+	}
 	metrics := utils.GenerateDeviceStatus(deviceType, limit)
 
 	c.JSON(http.StatusOK, metrics)

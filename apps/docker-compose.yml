@@ -90,6 +90,26 @@ services:
     restart: unless-stopped
     networks:
       - smarthome-network
+  
+  telemetry-db-postgres:
+    image: postgres:16-alpine
+    container_name: telemetry-db-postgres
+    environment:
+      POSTGRES_USER: ${TELEMETRY_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${TELEMETRY_POSTGRES_PASSWORD}
+      POSTGRES_DB: telemetry
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "telemetry"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - smarthome-network
+    volumes:
+      - device_postgres_data:/var/lib/postgresql/data
+      - ./telemetry_service/init.sql:/docker-entrypoint-initdb.d/init.sql
   telemetry-service:
     build:
       context: ./telemetry_service

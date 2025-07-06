@@ -4,8 +4,8 @@ import (
 	"device_service/models"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -34,7 +34,7 @@ func NewTelemetryService(baseURL string) *TelemetryService {
 }
 
 func (s *TelemetryService) GetTelemetryByDeviceID(device_id int, device_type models.DeviceType) (*TelemetryResponse, error) {
-	url := fmt.Sprintf("%s/api/v1/telemetry?limit=1&device_type=%s&device_id=%s", s.BaseURL, device_type, strconv.Itoa(device_id))
+	url := fmt.Sprintf("%s/api/v1/telemetry?limit=1&device_type=%s", s.BaseURL, device_type)
 	resp, err := s.HTTPClient.Get(url)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching telemetry data: %w", err)
@@ -43,10 +43,17 @@ func (s *TelemetryService) GetTelemetryByDeviceID(device_id int, device_type mod
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
+	log.Printf("GetTelemetryByDeviceID: Telemetry got")
 
 	var telemetryResp TelemetryResponse
-	if err := json.NewDecoder(resp.Body).Decode(&telemetryResp); err != nil {
+
+	var telemetryRespArray []TelemetryResponse
+	if err := json.NewDecoder(resp.Body).Decode(&telemetryRespArray); err != nil {
 		return nil, fmt.Errorf("error decoding telemetry response: %w", err)
 	}
+	if len(telemetryRespArray) > 0 {
+		telemetryResp = telemetryRespArray[0]
+	}
+
 	return &telemetryResp, nil
 }

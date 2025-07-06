@@ -70,7 +70,8 @@ func (h *DeviceHandler) GetDevices(c *gin.Context) {
 	devices, _ := h.DB.GetDevices(context.Background(), userID, locID, type_code)
 	for i, device := range devices {
 		teleData, err := h.TelemetryService.GetTelemetryByDeviceID(device.ID, device.Type)
-		if err != nil {
+		log.Println("GetDevices handler, GetTelemetryByDeviceID finished")
+		if err == nil {
 			// Update device with real-time data
 			devices[i].Value = float32(teleData.Value)
 			devices[i].Status = teleData.Status

@@ -90,6 +90,16 @@ services:
     restart: unless-stopped
     networks:
       - smarthome-network
+  telemetry-service:
+    build:
+      context: ./telemetry_service
+      dockerfile: Dockerfile
+    container_name: telemetry_service
+    ports:
+      - "8083:8080"
+    restart: unless-stopped
+    networks:
+      - smarthome-network
 
 
 

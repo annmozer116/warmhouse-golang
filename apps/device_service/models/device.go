@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// SensorType represents the type of sensor
+// DeviceType represents the type of device
 type DeviceType string
 
 // [lighting, temperature, videocam, smoke_detector]

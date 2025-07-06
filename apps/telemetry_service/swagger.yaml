@@ -59,14 +59,6 @@ paths:
           schema:
             type: string
             format: uuid
-        - name: metric_types
-          in: query
-          description: Фильтр по метрикам
-          schema:
-            type: array
-            items:
-              type: string
-              enum: [open_close_status, on_off_status, temperature, luminance]
         - name: limit
           in: query
           description: Количество записей (по умолчанию 10)

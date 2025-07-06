@@ -30,8 +30,8 @@ components:
           example: "Лампочка в люстре"
         classification_type:
           type: string
-          enum: [lighting, thermostat, videocam, smoke_detector]
-          example: thermostat
+          enum: [lighting, temperature, videocam, smoke_detector]
+          example: lighting
         location_id:
           type: string
           format: uuid
@@ -121,9 +121,9 @@ paths:
       security:
         - TestUserId: []
       parameters:
-        - name: house_id
+        - name: location_id
           in: query
-          description: Фильтр по дому
+          description: Фильтр по локации
           schema:
             type: string
             format: uuid
@@ -132,7 +132,7 @@ paths:
           description: Фильтр по типу устройства
           schema:
             type: string
-            enum: [lighting, thermostat, videocam, smoke_detector]
+            enum: [lighting, temperature, videocam, smoke_detector]
       responses:
         "200":
           description: Успешный ответ

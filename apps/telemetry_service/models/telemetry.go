@@ -2,13 +2,13 @@ package models
 
 import (
 	"fmt"
+	"log"
 	"strings"
 )
 
 // DeviceType represents the type of device
 type DeviceType string
 
-// [lighting, temperature, videocam, smoke_detector]
 const (
 	Temperature DeviceType = "temperature"
 	Light       DeviceType = "lighting"
@@ -30,6 +30,7 @@ type DeviceMetric struct {
 }
 
 func ConvertToDeviceType(s string) (DeviceType, error) {
+	log.Printf("device_type is%s", s)
 	switch strings.ToLower(s) {
 	case "temperature", "sensor", "thermostat":
 		return Temperature, nil

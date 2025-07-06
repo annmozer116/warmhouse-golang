@@ -115,6 +115,11 @@ services:
       context: ./telemetry_service
       dockerfile: Dockerfile
     container_name: telemetry_service
+    depends_on:
+      telemetry-db-postgres:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgres://${DEVICE_POSTGRES_USER}:${DEVICE_POSTGRES_PASSWORD}@telemetry-db-postgres:5432/telemetry
     ports:
       - "8083:8080"
     restart: unless-stopped

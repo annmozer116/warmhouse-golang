@@ -1,13 +1,14 @@
 package utils
 
 import (
+	"log"
 	"math/rand"
 	"telemetry_service/models"
 )
 
 // GenerateDeviceStatus генерирует случайные данные для устройства
 func GenerateDeviceStatus(deviceType models.DeviceType, limit int) []models.DeviceMetric {
-
+	log.Printf("GenerateDeviceStatus, device type is %s", deviceType)
 	metrics := make([]models.DeviceMetric, limit)
 
 	switch deviceType {
@@ -41,6 +42,7 @@ func GenerateDeviceStatus(deviceType models.DeviceType, limit int) []models.Devi
 
 // Вспомогательные функции для генерации статусов
 func randomLightingMetric() models.DeviceMetric {
+	log.Printf("randomLightingMetric()")
 	statuses := []string{"on", "off", "dimmed", "color_change"}
 	lightStatus := statuses[rand.Intn(len(statuses))]
 	metricObject := models.DeviceMetric{

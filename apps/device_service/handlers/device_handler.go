@@ -4,6 +4,7 @@ import (
 	"context"
 	"device_service/db"
 	"device_service/models"
+	"device_service/services"
 	"log"
 	"net/http"
 	"strconv"
@@ -12,16 +13,16 @@ import (
 )
 
 type DeviceHandler struct {
-	DB *db.DB
-	// TelemetryService *services.TelemetryService
+	DB               *db.DB
+	TelemetryService *services.TelemetryService
 }
 
 // NewDeviceHandler creates a new DeviceHandler
 // telemetryService *services.TelemetryService
-func NewDeviceHandler(db *db.DB) *DeviceHandler {
+func NewDeviceHandler(db *db.DB, telemetryService *services.TelemetryService) *DeviceHandler {
 	return &DeviceHandler{
-		DB: db,
-		// TelemetryService: telemetryService,
+		DB:               db,
+		TelemetryService: telemetryService,
 	}
 }
 
@@ -67,6 +68,19 @@ func (h *DeviceHandler) GetDevices(c *gin.Context) {
 	type_code := c.Query("type")
 
 	devices, _ := h.DB.GetDevices(context.Background(), userID, locID, type_code)
+	for i, device := range devices {
+		teleData, err := h.TelemetryService.GetTelemetryByDeviceID(device.ID, device.Type)
+		if err != nil {
+			// Update device with real-time data
+			devices[i].Value = float32(teleData.Value)
+			devices[i].Status = teleData.Status
+			devices[i].Unit = teleData.Unit
+			devices[i].MetricType = teleData.MetricType
+			log.Printf("Updated telemetry data for device %d from external API", device.ID)
+		} else {
+			log.Printf("Failed to fetch telemetry data for device %d: %v", device.ID, err)
+		}
+	}
 
 	c.JSON(http.StatusOK, devices)
 

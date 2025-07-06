@@ -81,6 +81,9 @@ type Device struct {
 	DeviceModelID DeviceModelID `json:"model_id"`
 	LastUpdated   time.Time     `json:"last_updated"`
 	CreatedAt     time.Time     `json:"created_at"`
+	Value         float32       `json:"value"`
+	Unit          string        `json:"unit"`
+	MetricType    string        `json:"metric_type"`
 }
 
 // DeviceCreate represents the data needed to create a new device

@@ -4,6 +4,7 @@ import (
 	"context"
 	"device_service/db"
 	"device_service/handlers"
+	"device_service/services"
 	"log"
 	"net/http"
 	"os"
@@ -25,9 +26,9 @@ func main() {
 
 	log.Println("Connected to database successfully")
 
-	// telemetryAPIURL := getEnv("TELEMETRY_API_URL", "http://telemetry-api:8081")
-	// telemetryService := services.NewTelemetryService(telemetryAPIURL)
-	// log.Printf("Telemetry service initialized with API URL: %s\n", telemetryAPIURL)
+	telemetryAPIURL := getEnv("TELEMETRY_API_URL", "http://telemetry-api:8081")
+	telemetryService := services.NewTelemetryService(telemetryAPIURL)
+	log.Printf("Telemetry service initialized with API URL: %s\n", telemetryAPIURL)
 
 	router := gin.Default()
 
@@ -39,7 +40,7 @@ func main() {
 	})
 	// API routes
 	apiRoutes := router.Group("/api/v1")
-	deviceHandler := handlers.NewDeviceHandler(database)
+	deviceHandler := handlers.NewDeviceHandler(database, telemetryService)
 	deviceHandler.RegisterRoutes(apiRoutes)
 
 	// Start server

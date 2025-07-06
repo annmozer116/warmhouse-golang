@@ -77,6 +77,16 @@ type DeviceCreate struct {
 	OwnerID       int
 }
 
+// DeviceCreate represents the data needed to create a new device
+type DeviceCreateV0 struct {
+	Name          string `json:"name" binding:"required"`
+	Location      string `json:"location" binding:"required"`
+	Type          DeviceType
+	DeviceModelID DeviceModelID `json:"model_id" binding:"required"`
+	Serial_Number string        `json:"serial_number" binding:"required"`
+	OwnerID       int
+}
+
 func NewDeviceCreate(name string, location_id int, model_id DeviceModelID, serial_number string, owner_id int) (*DeviceCreate, error) {
 	type_code, exists := GetDeviceType(model_id)
 	if !exists {

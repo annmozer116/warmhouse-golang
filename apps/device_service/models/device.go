@@ -54,6 +54,22 @@ func GetDeviceType(modelID DeviceModelID) (DeviceType, bool) {
 	return deviceType, exists
 }
 
+// GetLocationId возвращает id комнаты по названию
+func GetLocationId(location string) int {
+	var location_id int
+	switch location {
+	case "Living Room":
+		location_id = 1
+	case "Bedroom":
+		location_id = 2
+	case "Kitchen":
+		location_id = 3
+	default:
+		location_id = 0
+	}
+	return location_id
+}
+
 // Device for smart home
 type Device struct {
 	ID            int           `json:"id"`

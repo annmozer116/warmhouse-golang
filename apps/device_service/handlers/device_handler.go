@@ -32,6 +32,7 @@ func (h *DeviceHandler) RegisterRoutes(router *gin.RouterGroup) {
 		devices.GET("", h.GetDevices)
 		// devices.GET("/:id", h.GetDeviceByID)
 		devices.POST("", h.CreateDevice)
+		devices.POST("/transfer", h.CreateDeviceTransfer)
 		// devices.PUT("/:id", h.UpdateDevice)
 		// devices.DELETE("/:id", h.DeleteDevice)
 		// devices.PATCH("/:id/value", h.UpdateDeviceValue)
@@ -95,6 +96,51 @@ func (h *DeviceHandler) CreateDevice(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Device not supported"})
 		return
 	}
+	deviceCreate.Type = type_code
+	deviceCreate.OwnerID = userID
+
+	device, err := h.DB.CreateDevice(context.Background(), deviceCreate)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusCreated, device)
+}
+
+// CreateDeviceTransfer is used for monolyth integration. In: location name, convert to id, get type by model, save
+func (h *DeviceHandler) CreateDeviceTransfer(c *gin.Context) {
+	userIDHeader := c.GetHeader("X-user-id")
+	if userIDHeader == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing X-user-Id header"})
+		return
+	}
+
+	userID, err := strconv.Atoi(userIDHeader)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	var deviceCreateTransfer models.DeviceCreateV0
+	if err := c.ShouldBindJSON(&deviceCreateTransfer); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	location_id := models.GetLocationId(deviceCreateTransfer.Location)
+
+	deviceCreate := models.DeviceCreate{
+		Name:          deviceCreateTransfer.Name,
+		DeviceModelID: deviceCreateTransfer.DeviceModelID,
+		Serial_Number: deviceCreateTransfer.Serial_Number,
+		LocationID:    location_id,
+	}
+	type_code, exists := models.GetDeviceType(deviceCreate.DeviceModelID)
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Device not supported"})
+		return
+	}
+
+	deviceCreate.LocationID = location_id
 	deviceCreate.Type = type_code
 	deviceCreate.OwnerID = userID
 

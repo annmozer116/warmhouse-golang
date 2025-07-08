@@ -88,7 +88,7 @@
 
 **Диаграмма кода (Code)**
 
-[add device to catalog at partner-service](schemas/v2/code/Smarthome-sequence-partner-add-model.puml)
+[add device to catalog at partner-service](schemas/v2/code/Smarthome-sequence-partner-add-model.png)
 
 # Задание 3. Разработка ER-диаграммы
 
@@ -109,6 +109,7 @@ AsyncAPI (очередь) - для асинхронного взаимодейс
 
 [telemetry-service swagger ](apps/device_service/swagger.yaml)
 
+[telemetry-service-for async operations](apps/telemetry_service/async-api.yaml)
 
 # Задание 5. Работа с docker и docker-compose
 

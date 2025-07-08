@@ -1,0 +1,98 @@
+asyncapi: 3.0.0
+info:
+  title: Device Command Service
+  version: 1.0.0
+  description: Асинхронный API для отправки команд на устройства через очередь
+defaultContentType: application/json
+servers:
+  production:
+    host: "kafka-broker:9092"
+    protocol: kafka
+    description: Production Kafka broker
+  staging:
+    host: "rabbitmq-host:5672"
+    protocol: amqp
+    description: Staging RabbitMQ broker
+channels:
+  device.commands:
+    address: device.commands
+    messages:
+      publish.message:
+        $ref: "#/components/messages/DeviceCommand"
+operations:
+  device.commands.publish:
+    action: receive
+    channel:
+      $ref: "#/channels/device.commands"
+    messages:
+      - $ref: "#/channels/device.commands/messages/publish.message"
+components:
+  messages:
+    DeviceCommand:
+      name: deviceCommand
+      title: Device Command
+      summary: Команда для управления устройством
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/DeviceCommand"
+      traits:
+        - $ref: "#/components/messageTraits/CorrelationId"
+  schemas:
+    DeviceCommand:
+      type: object
+      required:
+        - device_id
+        - command
+      properties:
+        correlation_id:
+          type: string
+          description: Идентификатор для отслеживания команды
+          example: cmd-550e8400-e29b-41d4-a716-446655440000
+        device_id:
+          type: string
+          format: uuid
+          description: Уникальный идентификатор устройства
+          example: d3b8b8a0-5b9a-4e8f-8c0d-7b6f2d2b8d8c
+        command:
+          type: string
+          enum:
+            - "on"
+            - "off"
+            - open
+            - close
+            - change_value
+          description: Тип команды
+          example: change_value
+        value:
+          type: number
+          description: Значение для команд изменения состояния
+          example: 25.5
+        timestamp:
+          type: string
+          format: date-time
+          description: Время создания команды
+          example: "2023-05-15T12:30:45Z"
+        metadata:
+          type: object
+          description: Дополнительные метаданные
+          properties:
+            initiator:
+              type: string
+              enum:
+                - user
+                - automation
+                - admin
+            priority:
+              type: string
+              enum:
+                - low
+                - normal
+                - high
+          example:
+            initiator: user
+            priority: normal
+  messageTraits:
+    CorrelationId:
+      correlationId:
+        location: $message.payload#/correlation_id
+        description: Идентификатор корреляции для отслеживания команды

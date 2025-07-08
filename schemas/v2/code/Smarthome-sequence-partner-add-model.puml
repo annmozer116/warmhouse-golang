@@ -1,4 +1,4 @@
-@startuml
+@startuml Smarthome-sequence-partner-add-model
 title Добавление модели устройства в каталог
 
 actor "Admin Web App" as Admin

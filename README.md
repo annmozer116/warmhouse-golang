@@ -47,7 +47,6 @@
 
 ### 5. Визуализация контекста системы — диаграмма С4
 
-Добавьте сюда диаграмму контекста в модели C4.
 [AS IS Context diagram](schemas/v2/context/Warmhouse-context.png) 
 
 [TO BE Context map](schemas/v2/context/Smarthome-Context-Map.png)
@@ -76,6 +75,7 @@
 [SmartHome-container-diagram](schemas/v2/container/Smart-home-container.png)
 
 **Диаграмма компонентов (Components)**
+
 [device-manage-service](schemas/v2/component/Smarthome-component-device-manage.png)
 
 [device-gateway-service](schemas/v2/component/Smarthome-component-device-gateway.png)

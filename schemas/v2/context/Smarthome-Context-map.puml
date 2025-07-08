@@ -15,12 +15,12 @@ Person(admin, "Администратор", "Администратор экос
 Enterprise_Boundary(c0, "Система управления умным домом") {
     Boundary(smart_home_manage_b, $type="Домен", "Домен управления умным домом") {
         System(smart_home_manage, "Система управления устройствами")
-        Boundary(sensors_manage_b, $type="поддомен", "Поддомен управления устройствами"){
-            System(sensors_manage_с, "Контекст управление устройствами")
+        Boundary(device_manage_b, $type="поддомен", "Поддомен управления устройствами"){
+            System(device_manage_с, "Контекст управление устройствами")
         }
-        Boundary(sensors_monitoring_b, $type="поддомен", "Поддомен взаимодействие с устройствами"){
-            System(sensors_monitoring_c, "Контекст получение и обработка телеметрии с устройств")
-            System(sensors_command_с, "Контекст отправка команд на устройство")
+        Boundary(device_monitoring_b, $type="поддомен", "Поддомен взаимодействие с устройствами"){
+            System(device_monitoring_c, "Контекст получение и обработка телеметрии с устройств")
+            System(device_command_с, "Контекст отправка команд на устройство")
         }
     }
     System_Boundary(scenario_b, "Домен автоматизации сценариев") {
@@ -39,33 +39,33 @@ Enterprise_Boundary(c0, "Система управления умным домо
         }
 
     }
-    System_Ext(sensor, "Умные устройства")
+    System_Ext(device, "Умные устройства")
 }
 
 Rel(user,smart_home_manage, "Управляет устройствами")
 Rel(user, user_manage_c, "Авторизуется и регистрируется")
 
-Rel(smart_home_manage, sensors_manage_с, " Получает, регистрирует устройства via")
-Rel(smart_home_manage, sensors_monitoring_c, "Получает телеметрию via")
-Rel(smart_home_manage, sensors_command_с, "Отправляет команды на устройства via")
+Rel(smart_home_manage, device_manage_с, " Получает, регистрирует устройства via")
+Rel(smart_home_manage, device_monitoring_c, "Получает телеметрию via")
+Rel(smart_home_manage, device_command_с, "Отправляет команды на устройства via")
 
-Rel(sensors_manage_с, partners_manage_c, " Получает доступные устройства via")
-Rel(sensors_manage_с, sensors_monitoring_c, "Сообщает о новых устройствах")
+Rel(device_manage_с, partners_manage_c, " Получает доступные устройства via")
+Rel(device_manage_с, device_monitoring_c, "Сообщает о новых устройствах")
 
-Rel(sensors_monitoring_c, sensor, "Получает телеметрию")
-' Rel(sensors_monitoring_c, scenario_event_monitoring_c, "Передает телеметрию для сценариев")
+Rel(device_monitoring_c, device, "Получает телеметрию")
+' Rel(device_monitoring_c, scenario_event_monitoring_c, "Передает телеметрию для сценариев")
 
-Rel(sensors_command_с, sensor, "Отправляет команды")
-Rel(sensors_command_с, partners_manage_c, "Проверяет доступные команды")
+Rel(device_command_с, device, "Отправляет команды")
+Rel(device_command_с, partners_manage_c, "Проверяет доступные команды")
 
 Rel(user,scenario_manage_c, "Управляет сценариями")
 ' систем управления сценариями получает статус исполнения сценариев
 
 Rel(scenario_manage_c,scenario_event_monitoring_c, "Сообщает об изменении сценария")
 
-Rel(scenario_event_monitoring_c, sensors_monitoring_c, "Получает телеметрию для сценариев")
+Rel(scenario_event_monitoring_c, device_monitoring_c, "Получает телеметрию для сценариев")
 ' или напрямую с датчика? 
-Rel(scenario_event_monitoring_c, sensors_command_с, "Отправляет команды")
+Rel(scenario_event_monitoring_c, device_command_с, "Отправляет команды")
 Rel(scenario_event_monitoring_c, scenario_manage_c, "Сообщает о статусе исполнения сценария")
 
 Rel(admin, partners_manage_c, "Управляет доступными устройствами,партнерами, командами")

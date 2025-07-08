@@ -107,7 +107,7 @@ AsyncAPI (очередь) - для асинхронного взаимодейс
 ### 2. Документация API
 [device-service swagger ](apps/device_service/swagger.yaml)
 
-[telemetry-service swagger ](apps/device_service/swagger.yaml)
+[telemetry-service swagger ](apps/telemetry_service/swagger.yaml)
 
 [telemetry-service-for async operations](apps/telemetry_service/async-api.yaml)
 

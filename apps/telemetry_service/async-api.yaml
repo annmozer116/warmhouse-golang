@@ -1,31 +1,23 @@
-asyncapi: 3.0.0
+asyncapi: 2.5.0
 info:
   title: Device Command Service
   version: 1.0.0
   description: Асинхронный API для отправки команд на устройства через очередь
-defaultContentType: application/json
+
 servers:
   production:
-    host: "kafka-broker:9092"
+    url: kafka://kafka-broker:9092
     protocol: kafka
     description: Production Kafka broker
-  staging:
-    host: "rabbitmq-host:5672"
-    protocol: amqp
-    description: Staging RabbitMQ broker
+
+defaultContentType: application/json
+
 channels:
   device.commands:
-    address: device.commands
-    messages:
-      publish.message:
+    publish:
+      message:
         $ref: "#/components/messages/DeviceCommand"
-operations:
-  device.commands.publish:
-    action: receive
-    channel:
-      $ref: "#/channels/device.commands"
-    messages:
-      - $ref: "#/channels/device.commands/messages/publish.message"
+
 components:
   messages:
     DeviceCommand:
@@ -36,7 +28,8 @@ components:
       payload:
         $ref: "#/components/schemas/DeviceCommand"
       traits:
-        - $ref: "#/components/messageTraits/CorrelationId"
+        - $ref: "#/components/messageTraits/TaskId"
+
   schemas:
     DeviceCommand:
       type: object
@@ -44,25 +37,20 @@ components:
         - device_id
         - command
       properties:
-        correlation_id:
+        task_id:
           type: string
-          description: Идентификатор для отслеживания команды
-          example: cmd-550e8400-e29b-41d4-a716-446655440000
+          description: Уникальный идентификатор задачи
+          example: "task-550e8400-e29b-41d4-a716-446655440000"
         device_id:
           type: string
           format: uuid
           description: Уникальный идентификатор устройства
-          example: d3b8b8a0-5b9a-4e8f-8c0d-7b6f2d2b8d8c
+          example: "d3b8b8a0-5b9a-4e8f-8c0d-7b6f2d2b8d8c"
         command:
           type: string
-          enum:
-            - "on"
-            - "off"
-            - open
-            - close
-            - change_value
+          enum: [on, off, open, close, change_value]
           description: Тип команды
-          example: change_value
+          example: "change_value"
         value:
           type: number
           description: Значение для команд изменения состояния
@@ -78,21 +66,16 @@ components:
           properties:
             initiator:
               type: string
-              enum:
-                - user
-                - automation
-                - admin
+              enum: [user, automation, admin]
             priority:
               type: string
-              enum:
-                - low
-                - normal
-                - high
+              enum: [low, normal, high]
           example:
-            initiator: user
-            priority: normal
+            initiator: "user"
+            priority: "normal"
+
   messageTraits:
-    CorrelationId:
+    TaskId:
       correlationId:
-        location: $message.payload#/correlation_id
-        description: Идентификатор корреляции для отслеживания команды
+        location: "$message.payload#/task_id"
+        description: Идентификатор задачи для отслеживания выполнения

@@ -49,6 +49,7 @@
 
 Добавьте сюда диаграмму контекста в модели C4.
 [AS IS Context diagram](schemas/v2/context/Warmhouse-context.png) 
+
 [TO BE Context map](schemas/v2/context/Smarthome-Context-Map.png)
 
 # Задание 2. Проектирование микросервисной архитектуры
@@ -76,9 +77,13 @@
 
 **Диаграмма компонентов (Components)**
 [device-manage-service](schemas/v2/component/Smarthome-component-device-manage.png)
+
 [device-gateway-service](schemas/v2/component/Smarthome-component-device-gateway.png)
+
 [partner-service](schemas/v2/component/Smarthome-component-partner.png)
+
 [scenario-service](schemas/v2/component/Smarthome-component-scenario.png)
+
 [user-service](schemas/v2/component/Smarthome-component-user.png)
 
 **Диаграмма кода (Code)**
@@ -99,6 +104,7 @@ AsyncAPI (очередь) - для асинхронного взаимодейс
 
 ### 2. Документация API
 [device-service swagger ](apps/device_service/swagger.yaml)
+
 [telemetry-service swagger ](apps/device_service/swagger.yaml)
 
 
@@ -185,5 +191,6 @@ TELEMETRY_POSTGRES_USER=postgres
 4. device-service интегрирован с telemetry-service в методе получения списка девайсов
 
 - [Device-service postman collection](/apps/device_service/SmartHomeDeviceService.postman_collection.json)
+
 - [Telemetry-service postman collection](/apps/telemetry_service/SmartHomeTelemetry%20service.postman_collection.json)
 

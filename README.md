@@ -88,7 +88,7 @@
 
 **Диаграмма кода (Code)**
 
-Добавьте одну диаграмму или несколько.
+[add device to catalog at partner-service](schemas/v2/code/Smarthome-sequence-partner-add-model.puml)
 
 # Задание 3. Разработка ER-диаграммы
 

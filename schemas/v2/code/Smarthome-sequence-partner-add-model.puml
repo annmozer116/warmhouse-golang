@@ -1,0 +1,43 @@
+@startuml
+title Добавление модели устройства в каталог
+
+actor "Admin Web App" as Admin
+participant "Device Catalog\nController" as Controller
+participant "Auth check" as Auth
+participant "Catalog Service" as Service
+database "Partner DB" as DB
+
+Admin -> Controller: POST /models {name: "SmartCam", type: "camera"}
+activate Controller
+
+Controller -> Auth: validateToken()
+activate Auth
+Auth --> Controller: OK (200)
+deactivate Auth
+
+Controller -> Service: addDeviceModel(modelData)
+activate Service
+
+Service -> Service: validateType("camera")
+activate Service
+
+Service -> DB: SELECT EXISTS(\n  SELECT 1 FROM device_types\n  WHERE type = 'camera'\n)
+activate DB
+DB --> Service: true
+deactivate DB
+
+Service --> Service: Validation OK
+deactivate Service
+
+Service -> DB: INSERT INTO device_models (...) \nVALUES (...)\nRETURNING id
+activate DB
+DB --> Service: 42 (ID модели)
+deactivate DB
+
+Service --> Controller: Model created (ID: 42)
+deactivate Service
+
+Controller --> Admin: 201 Created\n{id: 42, name: "SmartCam"}
+deactivate Controller
+
+@enduml

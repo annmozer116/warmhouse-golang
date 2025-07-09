@@ -1,0 +1,168 @@
+{
+	"info": {
+		"_postman_id": "a999d7c6-9bcd-4ce6-9481-5bc396efc5b6",
+		"name": "SmartHomeDeviceService",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2387551",
+		"_collection_link": "https://anna11-1974.postman.co/workspace/Ya-practicum~82937d90-e302-4970-bf0f-42e9328f3df9/collection/2387551-a999d7c6-9bcd-4ce6-9481-5bc396efc5b6?action=share&source=collection_link&creator=2387551"
+	},
+	"item": [
+		{
+			"name": "Get devices",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-user-id",
+						"value": "1",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8082/api/v1/devices",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"api",
+						"v1",
+						"devices"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get devices",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-user-id",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8082/api/v1/devices",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"api",
+								"v1",
+								"devices"
+							]
+						}
+					},
+					"_postman_previewlanguage": "",
+					"header": [],
+					"cookie": [
+						{
+							"expires": "Invalid Date"
+						}
+					],
+					"body": ""
+				}
+			]
+		},
+		{
+			"name": "Create Device",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-user-id",
+						"value": "2",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Мой новый светильник в гостиной\",\n    \"location_id\": \"1\",\n    \"model_id\": \"9\", \n    \"serial_number\": \"0000-VHGV-576\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/api/v1/devices",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"api",
+						"v1",
+						"devices"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Create Device",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-user-id",
+								"value": "2",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Мой новый светильник в гостиной\",\n    \"location_id\": 1,\n    \"model_id\": 9, \n    \"serial_number\": \"0000-VHGV-576\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8082/api/v1/devices",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"api",
+								"v1",
+								"devices"
+							]
+						}
+					},
+					"_postman_previewlanguage": "",
+					"header": [],
+					"cookie": [
+						{
+							"expires": "Invalid Date"
+						}
+					],
+					"body": ""
+				}
+			]
+		}
+	]
+}

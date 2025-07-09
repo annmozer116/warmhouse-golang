@@ -1,0 +1,88 @@
+@startuml Smart-home-container
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+' uncomment the following line and comment the first to use locally
+' !include C4_Container.puml
+
+' LAYOUT_TOP_DOWN()
+' LAYOUT_AS_SKETCH()
+LAYOUT_WITH_LEGEND()
+
+title Smarthome container diagram TO-BE
+
+Person(user, "Клиент", "Клиент экосистемы умного дома")
+Person(admin, "Администратор", "Администратор экосистемы")
+
+System_Boundary(c1, "Система управления умным домом") {
+    Container(admin_web_app, "Web Application", "ReactJS", "Сайт для администрирования экосистемы")
+    Container(mobile_app, "Mobile App", "C#, Xamarin", "Приложение для управления умным домом для клиента")
+
+    Container(user_service, "User service", "Golang", "Сервис авторизации, регистрации, управления доступами")
+    ContainerDb(user_service_db, "User-db", "Postgresql", "Пользователи, роли, пермишены, сессии")
+
+    Container(partner_service, "Partner service", "Golang", "Сервис управления доступными устройствами партнеров и их командами")
+    ContainerDb(partner_service_db, "Partner-db", "Postgresql", "Каталог доступных устройств и их команд")
+
+    Container(device_manage_service, "Device manage service", "Golang", "Сервис позволяет зарегистрировать устройство, локацию, получить список устройств и их состояние")
+    ContainerDb(device_manage_service_db, "device-manage-db", "Postgresql", "Зарегистрированные устройства, привязка к локации, каталог локаций")
+
+    Container(device_gw_service, "device gateway", "Golang", "Сервис взаимодействия с устройствами (отправка команд и сбор телеметрии)")
+    ContainerDb(telemetry_cache, "Telemetry cache", "Redis", "Телеметрия")
+    ContainerDb(telemetry_history, "Telemetry history", "S3", "Телеметрия (теплые данные)")
+
+    ContainerQueue(smarthome_mq, "Message Queue", "kafka")
+
+    Container(scenario_service, "Scenario service", "Golang", "Сервис управления автоматизированными сценариями")
+    ContainerDb(scenario_service_db, "Scenario db", "Object-oriented-db", "Сценарии")
+
+    ' ContainerDb(database, "Database", "SQL Database", "Stores user registration information, hashed auth credentials, access logs, etc.")
+    ' Container(backend_api, "API Application", "Java, Docker Container", "Provides Internet banking functionality via API")
+}
+System_Ext(device, "Умные устройства")
+
+Rel(user, mobile_app, "uses", "HTTPS")
+Rel(admin, admin_web_app, "uses", "HTTPS")
+
+Rel_R(mobile_app,user_service, "authorize by", "HTTPS")
+Rel(admin_web_app,user_service, "use, authorize by", "HTTPS")
+Rel(admin_web_app,device_manage_service, "uses", "HTTPS")
+Rel_Neighbor(user_service,user_service_db, "read, write data", "sync, JDBC")
+
+Rel(admin_web_app, partner_service, "uses", "HTTPS")
+Rel(partner_service, partner_service_db, "Read, write data", "sync, JDBC")
+
+Rel(mobile_app, device_manage_service, "uses", "WebSockets")
+Rel_Neighbor(device_manage_service, device_manage_service_db, "read, write data", "sync, JDBC")
+
+Rel(device_manage_service, smarthome_mq, "sends command, device update", "TCP")
+Rel_U(device_gw_service, smarthome_mq, "reads command, device updates, write telemetry", "TCP")
+
+Rel(device_manage_service, partner_service, "check device", "HTTPS")
+
+Rel(device_manage_service, device_gw_service, "use", "HTTPS")
+
+Rel(device_gw_service, device, "sends command", "HTTPS/other internet protocols")
+Rel_U(device_gw_service, telemetry_cache, "read, write telemetry, cache, read devices", "TCP")
+Rel_Neighbor(device_gw_service, telemetry_history, "read, write", "HTTPS")
+
+Rel(mobile_app, scenario_service, "uses", "HTTPS")
+Rel_L(scenario_service, scenario_service_db, "read, write data", "JDBC")
+Rel(scenario_service, smarthome_mq, "reads telemetry, sends command", "TCP")
+
+
+
+' System_Ext(email_system, "E-Mail System", "The internal Microsoft Exchange system")
+' System_Ext(banking_system, "Mainframe Banking System", "Stores all of the core banking information about customers, accounts, transactions, etc.")
+
+' Rel(customer, web_app, "Uses", "HTTPS")
+' Rel(customer, spa, "Uses", "HTTPS")
+' Rel(customer, mobile_app, "Uses")
+
+' Rel_Neighbor(web_app, spa, "Delivers")
+' Rel(spa, backend_api, "Uses", "async, JSON/HTTPS")
+' Rel(mobile_app, backend_api, "Uses", "async, JSON/HTTPS")
+' Rel_Back_Neighbor(database, backend_api, "Reads from and writes to", "sync, JDBC")
+
+' Rel_Back(customer, email_system, "Sends e-mails to")
+' Rel_Back(email_system, backend_api, "Sends e-mails using", "sync, SMTP")
+' Rel_Neighbor(backend_api, banking_system, "Uses", "sync/async, XML/HTTPS")
+@enduml

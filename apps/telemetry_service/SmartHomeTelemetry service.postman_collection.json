@@ -1,0 +1,95 @@
+{
+	"info": {
+		"_postman_id": "12d3075f-22b0-486f-b6ac-457b54d6b1de",
+		"name": "SmartHomeTelemetry service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2387551",
+		"_collection_link": "https://anna11-1974.postman.co/workspace/Ya-practicum~82937d90-e302-4970-bf0f-42e9328f3df9/collection/2387551-12d3075f-22b0-486f-b6ac-457b54d6b1de?action=share&source=collection_link&creator=2387551"
+	},
+	"item": [
+		{
+			"name": "Get telemetry",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-user-id",
+						"value": "2",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Мой новый светильник в гостиной\",\n    \"location_id\": \"1\",\n    \"model_id\": \"9\", \n    \"serial_number\": \"0000-VHGV-576\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/api/v1/telemetry?limit=5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"api",
+						"v1",
+						"telemetry"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get telemetry by device type",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-user-id",
+						"value": "2",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Мой новый светильник в гостиной\",\n    \"location_id\": \"1\",\n    \"model_id\": \"9\", \n    \"serial_number\": \"0000-VHGV-576\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/api/v1/telemetry?limit=1&device_type=sensor",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"api",
+						"v1",
+						"telemetry"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "1"
+						},
+						{
+							"key": "device_type",
+							"value": "sensor"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

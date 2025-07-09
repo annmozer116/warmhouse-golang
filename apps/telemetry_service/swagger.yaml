@@ -1,0 +1,126 @@
+openapi: 3.0.0
+info:
+  title: Telemetry-service
+  description: Сервис получения телеметрии по устройствам
+  version: 1.0.0
+servers:
+  - url: https://localhost:8083
+    description: Local API
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      description: api-key for internal usage
+      name: X-api-key
+  schemas:
+    Telemetry:
+      type: object
+      properties:
+        value:
+          type: number
+          format: float
+          example: 23.4
+        status:
+          type: string
+          enum: [on, off, open, close]
+        metric_type:
+          type: string
+          enum: [open_close_status, on_off_status, temperature, luminance]
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-05-15T12:30:45Z"
+        device_id:
+          type: string
+          format: uuid
+          example: d3b8b8a0-5b9a-4e8f-8c0d-7b6f2d2b8d8c
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Device not found"
+        code:
+          type: integer
+          example: 404
+
+paths:
+  /api/v1/telemetry:
+    get:
+      summary: Получение телеметрии
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: device_id
+          in: query
+          required: true
+          description: Фильтр по устройству
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          description: Количество записей (по умолчанию 10)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: since
+          in: query
+          description: Фильтр по времени (UTC)
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Telemetry"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/command:
+    post:
+      summary: Команда на устройство
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: string
+                  format: uuid
+                  example: d3b8b8a0-5b9a-4e8f-8c0d-7b6f2d2b8d8c
+                command:
+                  type: string
+                  enum: [on, off, open, close, change_value]
+                  example: "change_value"
+                value:
+                  type: number
+                  example: 25.5
+      responses:
+        "201":
+          description: Команда отправлена
+        "400":
+          description: Не корректные параметры
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+security:
+  - ApiKeyAuth: []

@@ -18,13 +18,15 @@ import (
 type SensorHandler struct {
 	DB                 *db.DB
 	TemperatureService *services.TemperatureService
+	DeviceAPIService   *services.DeviceAPIService
 }
 
 // NewSensorHandler creates a new SensorHandler
-func NewSensorHandler(db *db.DB, temperatureService *services.TemperatureService) *SensorHandler {
+func NewSensorHandler(db *db.DB, temperatureService *services.TemperatureService, deviceAPIService *services.DeviceAPIService) *SensorHandler {
 	return &SensorHandler{
 		DB:                 db,
 		TemperatureService: temperatureService,
+		DeviceAPIService:   deviceAPIService,
 	}
 }
 
@@ -139,6 +141,14 @@ func (h *SensorHandler) CreateSensor(c *gin.Context) {
 	sensor, err := h.DB.CreateSensor(context.Background(), sensorCreate)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	deviceResp, err := h.DeviceAPIService.CreateDeviceForSensor(context.Background(), sensorCreate, sensor.ID)
+	log.Println(deviceResp)
+
+	if err != nil {
+		log.Printf("microservice error: %s", err.Error())
 		return
 	}
 

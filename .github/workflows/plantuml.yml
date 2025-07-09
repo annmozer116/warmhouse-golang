@@ -1,0 +1,61 @@
+# name: PlantUML Diagrams
+
+# on:
+#   push:
+#     branches:
+#       - warmhouse
+
+# jobs:
+#   generate-diagrams:
+#     runs-on: ubuntu-latest
+#     if: "!contains(github.event.head_commit.message, 'Automated diagram generation')"
+#     permissions:
+#       contents: write # Даем разрешение на запись в репозиторий
+
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v2
+
+#       - name: Set up Java
+#         uses: actions/setup-java@v2
+#         with:
+#           java-version: "11"
+#           distribution: "temurin"
+
+#       - name: Install Graphviz
+#         run: sudo apt-get install -y graphviz
+
+#       - name: Download PlantUML
+#         run: wget -O plantuml.jar https://github.com/plantuml/plantuml/releases/download/v1.2024.4/plantuml-1.2024.4.jar
+
+#       - name: Generate Diagrams
+#         run: |
+#           find schemas -name "*.puml" -not -path "./.git/*" -exec java -jar plantuml.jar -tpng {} \;
+
+#       - name: Upload diagrams as artifacts
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: diagrams
+#           path: schemas/**/*.png
+#           # Используем `if-no-files-found: error` или `warn` - но в нашем случае файлы есть
+#           if-no-files-found: warn
+
+#       - name: Deploy to GitHub Pages
+#         uses: peaceiris/actions-gh-pages@v3
+#         with:
+#           github_token: ${{ secrets.GITHUB_TOKEN }}
+#           publish_dir: ./schemas
+#           destination_dir: diagrams
+
+#       # - name: Commit Diagrams
+#       #   run: |
+#       #     git config --local user.email "github-actions[bot]@users.noreply.github.com"
+#       #     git config --local user.name "github-actions[bot]"
+#       #     git add schemas/**/*.png
+#       #     git diff --quiet && git diff --staged --quiet || git commit -m "Automated diagram generation"
+#       #     git push
+#       #     # git commit -m "Automated diagram generation"
+#       #     # git push origin warmhouse
+#       #   env:
+#       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       #   if: success()

@@ -108,7 +108,7 @@ services:
     networks:
       - smarthome-network
     volumes:
-      - device_postgres_data:/var/lib/postgresql/data
+      - telemetry_postgres_data:/var/lib/postgresql/data
       - ./telemetry_service/init.sql:/docker-entrypoint-initdb.d/init.sql
   telemetry-service:
     build:
@@ -131,6 +131,7 @@ services:
 volumes:
   postgres_data:
   device_postgres_data:
+  telemetry_postgres_data:
 
 networks:
   smarthome-network:
